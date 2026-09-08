@@ -1,0 +1,398 @@
+<title>Three-Finger Gestures</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo:wght@500;600;700;800&family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500;600&display=swap">
+<style>
+  :root{
+    --bg:#f3f6f6;
+    --surface:#ffffff;
+    --surface-2:#eef3f2;
+    --ink:#142027;
+    --ink-soft:#56666d;
+    --ink-faint:#8296992e;
+    --accent:#0e7c86;
+    --accent-strong:#0a5b63;
+    --accent-soft:#dcf0ee;
+    --line:#dde5e4;
+    --warn:#a15a12;
+    --warn-soft:#f7e6d3;
+  }
+  @media (prefers-color-scheme: dark){
+    :root:not([data-theme="light"]){
+      --bg:#0d1416;
+      --surface:#131b1d;
+      --surface-2:#182124;
+      --ink:#e6eeee;
+      --ink-soft:#93a6a9;
+      --accent:#56d6c9;
+      --accent-strong:#8be7dc;
+      --accent-soft:#163634;
+      --line:#223032;
+      --warn:#e3a460;
+      --warn-soft:#332417;
+    }
+  }
+  :root[data-theme="dark"]{
+    --bg:#0d1416;
+    --surface:#131b1d;
+    --surface-2:#182124;
+    --ink:#e6eeee;
+    --ink-soft:#93a6a9;
+    --accent:#56d6c9;
+    --accent-strong:#8be7dc;
+    --accent-soft:#163634;
+    --line:#223032;
+    --warn:#e3a460;
+    --warn-soft:#332417;
+  }
+
+  *{box-sizing:border-box;}
+  body{
+    margin:0;
+    background:var(--bg);
+    color:var(--ink);
+    font-family:"IBM Plex Sans","Segoe UI",Arial,sans-serif;
+    font-size:16px;
+    line-height:1.6;
+  }
+  ::selection{ background:var(--accent-soft); }
+
+  .page{
+    max-width:760px;
+    margin:0 auto;
+    padding:56px 24px 96px;
+  }
+
+  code, .mono{
+    font-family:"IBM Plex Mono","SFMono-Regular",Consolas,monospace;
+    font-size:0.88em;
+  }
+  code{
+    background:var(--surface-2);
+    border:1px solid var(--line);
+    border-radius:4px;
+    padding:0.1em 0.42em;
+  }
+
+  header.hero{
+    display:flex;
+    flex-direction:column;
+    gap:14px;
+    padding-bottom:32px;
+    border-bottom:1px solid var(--line);
+  }
+  .eyebrow{
+    font-family:"IBM Plex Mono",monospace;
+    font-size:12.5px;
+    letter-spacing:0.11em;
+    text-transform:uppercase;
+    color:var(--accent-strong);
+  }
+  h1{
+    font-family:"Archivo",Arial,sans-serif;
+    font-weight:800;
+    font-size:clamp(32px,5vw,44px);
+    line-height:1.05;
+    margin:0;
+    text-wrap:balance;
+    letter-spacing:-0.01em;
+  }
+  .dek{
+    color:var(--ink-soft);
+    font-size:17px;
+    max-width:58ch;
+    margin:0;
+  }
+  .chips{
+    display:flex;
+    flex-wrap:wrap;
+    gap:8px;
+    margin-top:4px;
+  }
+  .chip{
+    font-family:"IBM Plex Mono",monospace;
+    font-size:12.5px;
+    color:var(--ink-soft);
+    background:var(--surface-2);
+    border:1px solid var(--line);
+    border-radius:999px;
+    padding:5px 12px;
+  }
+
+  section{ margin-top:48px; }
+  h2{
+    font-family:"Archivo",Arial,sans-serif;
+    font-weight:700;
+    font-size:22px;
+    letter-spacing:-0.005em;
+    margin:0 0 6px;
+  }
+  .section-note{
+    color:var(--ink-soft);
+    margin:0 0 20px;
+    max-width:62ch;
+  }
+
+  /* gesture grid */
+  .grid{
+    display:grid;
+    grid-template-columns:repeat(2,1fr);
+    gap:14px;
+  }
+  @media (max-width:560px){ .grid{ grid-template-columns:1fr; } }
+  .gcard{
+    background:var(--surface);
+    border:1px solid var(--line);
+    border-radius:12px;
+    padding:18px 18px 20px;
+    display:flex;
+    flex-direction:column;
+    gap:12px;
+  }
+  .gcard svg{ display:block; }
+  .gcard .glabel{
+    font-family:"Archivo",Arial,sans-serif;
+    font-weight:700;
+    font-size:15px;
+  }
+  .gcard .gaction{
+    font-family:"IBM Plex Mono",monospace;
+    font-size:12.5px;
+    color:var(--accent-strong);
+    background:var(--accent-soft);
+    display:inline-block;
+    padding:3px 9px;
+    border-radius:5px;
+    width:fit-content;
+  }
+  .gcard p{
+    margin:0;
+    color:var(--ink-soft);
+    font-size:14px;
+  }
+
+  /* steps */
+  ol.steps{
+    list-style:none;
+    margin:0;
+    padding:0;
+    counter-reset:step;
+    display:flex;
+    flex-direction:column;
+  }
+  ol.steps > li{
+    counter-increment:step;
+    display:grid;
+    grid-template-columns:36px 1fr;
+    gap:16px;
+    padding:16px 0;
+    border-top:1px solid var(--line);
+  }
+  ol.steps > li:first-child{ border-top:none; padding-top:4px; }
+  ol.steps > li::before{
+    content:counter(step);
+    font-family:"Archivo",Arial,sans-serif;
+    font-weight:700;
+    font-size:15px;
+    color:var(--accent-strong);
+    background:var(--accent-soft);
+    width:32px;
+    height:32px;
+    border-radius:50%;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+  }
+  .step-body strong{ font-weight:600; }
+  .step-body p{ margin:2px 0 0; color:var(--ink-soft); }
+
+  /* troubleshooting */
+  dl.trouble{ margin:0; display:flex; flex-direction:column; gap:16px; }
+  dl.trouble > div{
+    display:grid;
+    grid-template-columns:1fr;
+    gap:4px;
+    padding-left:16px;
+    border-left:3px solid var(--warn);
+  }
+  dl.trouble dt{ font-weight:600; }
+  dl.trouble dd{ margin:0; color:var(--ink-soft); }
+
+  .callout{
+    background:var(--surface-2);
+    border:1px solid var(--line);
+    border-radius:12px;
+    padding:20px 22px;
+    display:flex;
+    flex-direction:column;
+    gap:10px;
+  }
+  .callout p{ margin:0; color:var(--ink-soft); }
+  .callout p strong{ color:var(--ink); }
+
+  footer{
+    margin-top:56px;
+    padding-top:20px;
+    border-top:1px solid var(--line);
+    color:var(--ink-soft);
+    font-size:13px;
+  }
+</style>
+
+<div class="page">
+
+  <header class="hero">
+    <span class="eyebrow">Touchpad · Gestures</span>
+    <h1>Three-finger swipes, wired into KWin</h1>
+    <p class="dek">Plasma 6.7's Touchpad panel has no gesture-assignment tab — checked directly on this machine. The real, verified path: a small gesture daemon that reads raw 3-finger swipes and fires KWin's existing global shortcuts over D-Bus.</p>
+    <div class="chips">
+      <span class="chip">Fedora Linux</span>
+      <span class="chip">KDE Plasma 6.7.4</span>
+      <span class="chip">Wayland session</span>
+      <span class="chip">libinput 1.31.3</span>
+      <span class="chip">Elan Touchpad detected</span>
+    </div>
+  </header>
+
+  <section>
+    <h2>What you're setting up</h2>
+    <p class="section-note">Each swipe calls a KWin action that already exists as a global shortcut — confirmed working on this machine via <code>busctl --user call org.kde.kglobalaccel</code>. The gesture daemon just supplies the missing "3-finger swipe → run this command" trigger.</p>
+    <div class="grid">
+
+      <div class="gcard">
+        <svg width="100%" height="72" viewBox="0 0 200 72">
+          <rect x="1" y="1" width="198" height="70" rx="10" fill="none" stroke="var(--line)" stroke-width="2"/>
+          <circle cx="76" cy="46" r="6" fill="var(--accent)"/>
+          <circle cx="100" cy="46" r="6" fill="var(--accent)"/>
+          <circle cx="124" cy="46" r="6" fill="var(--accent)"/>
+          <path d="M100 40 L100 16 M92 24 L100 14 L108 24" fill="none" stroke="var(--accent-strong)" stroke-width="4" stroke-linecap="round" stroke-linejoin="round"/>
+        </svg>
+        <span class="glabel">Swipe up</span>
+        <span class="gaction">Overview</span>
+        <p>Zooms out to all windows and desktops at once — the fastest way to jump between what's open.</p>
+      </div>
+
+      <div class="gcard">
+        <svg width="100%" height="72" viewBox="0 0 200 72">
+          <rect x="1" y="1" width="198" height="70" rx="10" fill="none" stroke="var(--line)" stroke-width="2"/>
+          <circle cx="76" cy="26" r="6" fill="var(--accent)"/>
+          <circle cx="100" cy="26" r="6" fill="var(--accent)"/>
+          <circle cx="124" cy="26" r="6" fill="var(--accent)"/>
+          <path d="M100 32 L100 56 M92 48 L100 58 L108 48" fill="none" stroke="var(--accent-strong)" stroke-width="4" stroke-linecap="round" stroke-linejoin="round"/>
+        </svg>
+        <span class="glabel">Swipe down</span>
+        <span class="gaction">Show Desktop</span>
+        <p>Minimizes every window to reveal the desktop; repeat the swipe to bring them back.</p>
+      </div>
+
+      <div class="gcard">
+        <svg width="100%" height="72" viewBox="0 0 200 72">
+          <rect x="1" y="1" width="198" height="70" rx="10" fill="none" stroke="var(--line)" stroke-width="2"/>
+          <circle cx="120" cy="26" r="6" fill="var(--accent)"/>
+          <circle cx="120" cy="46" r="6" fill="var(--accent)"/>
+          <circle cx="120" cy="66" r="6" fill="var(--accent)"/>
+          <path d="M112 46 L88 46 M96 38 L86 46 L96 54" fill="none" stroke="var(--accent-strong)" stroke-width="4" stroke-linecap="round" stroke-linejoin="round"/>
+        </svg>
+        <span class="glabel">Swipe left</span>
+        <span class="gaction">Desktop → right</span>
+        <p>Steps to the next virtual desktop. This machine had only one desktop — a second was created so this actually goes somewhere.</p>
+      </div>
+
+      <div class="gcard">
+        <svg width="100%" height="72" viewBox="0 0 200 72">
+          <rect x="1" y="1" width="198" height="70" rx="10" fill="none" stroke="var(--line)" stroke-width="2"/>
+          <circle cx="80" cy="26" r="6" fill="var(--accent)"/>
+          <circle cx="80" cy="46" r="6" fill="var(--accent)"/>
+          <circle cx="80" cy="66" r="6" fill="var(--accent)"/>
+          <path d="M88 46 L112 46 M104 38 L114 46 L104 54" fill="none" stroke="var(--accent-strong)" stroke-width="4" stroke-linecap="round" stroke-linejoin="round"/>
+        </svg>
+        <span class="glabel">Swipe right</span>
+        <span class="gaction">Desktop → left</span>
+        <p>Steps to the previous virtual desktop, mirroring the left swipe.</p>
+      </div>
+
+    </div>
+  </section>
+
+  <section>
+    <h2>Setup</h2>
+    <p class="section-note">One step needs <code>sudo</code> and a logout — everything after that is already done or is a plain config file.</p>
+    <ol class="steps">
+      <li>
+        <div class="step-body">
+          <strong>Add yourself to the <span class="mono">input</span> group, then log out.</strong>
+          <p>Reading raw gesture events from <code>/dev/input</code> requires it: <code>sudo usermod -aG input $USER</code>. This is the one step that needs your password — nothing else here does. Log out and back in (or reboot) for it to take effect.</p>
+        </div>
+      </li>
+      <li>
+        <div class="step-body">
+          <strong>Install <code>libinput-gestures</code>.</strong>
+          <p>Not in the Fedora repos — it's a small script from GitHub: <code>git clone https://github.com/bulletmark/libinput-gestures.git && cd libinput-gestures && sudo make install</code>. It depends on <code>python3</code> and the <code>libinput</code> CLI, both already on this system.</p>
+        </div>
+      </li>
+      <li>
+        <div class="step-body">
+          <strong>The config is already written.</strong>
+          <p><code>~/.config/libinput-gestures.conf</code> maps 3-finger up/down/left/right to <span class="mono">Overview</span>, <span class="mono">Show Desktop</span>, and desktop-switch-right/left. Each line runs the exact <code>busctl --user call org.kde.kglobalaccel …</code> command verified against this KWin session — nothing to fill in.</p>
+        </div>
+      </li>
+      <li>
+        <div class="step-body">
+          <strong>Start it.</strong>
+          <p><code>libinput-gestures-setup start</code> to run now, then <code>libinput-gestures-setup autostart</code> so it launches on login.</p>
+        </div>
+      </li>
+      <li>
+        <div class="step-body">
+          <strong>Swipe to test.</strong>
+          <p>Rest three fingertips together before moving them — libinput needs genuine simultaneous contact to tell a gesture from a scroll.</p>
+        </div>
+      </li>
+    </ol>
+  </section>
+
+  <section>
+    <h2>Already done on this machine</h2>
+    <div class="callout">
+      <p><strong>Verified live, before writing any of this:</strong> <span class="mono">Overview</span>, <span class="mono">Show Desktop</span>, and both desktop-switch shortcuts were each fired once over D-Bus and confirmed to work (screenshots taken, state restored). A second virtual desktop was also created — there was only one before, which would have made the left/right swipes silent no-ops.</p>
+      <p><strong>Not done:</strong> the <code>input</code>-group membership and <code>libinput-gestures</code> install above — both need your <code>sudo</code> password, which this session doesn't have. Run those two commands yourself (via <code>!command</code> if you're in Claude Code) and the gesture config is already sitting there ready to go.</p>
+    </div>
+  </section>
+
+  <section>
+    <h2>If a gesture doesn't fire</h2>
+    <dl class="trouble">
+      <div>
+        <dt>Nothing happens on any swipe</dt>
+        <dd>Check <code>libinput-gestures-setup status</code> — if it's not "running", the daemon isn't attached. A common cause is skipping the <code>input</code> group step, which silently fails to open the device.</dd>
+      </div>
+      <div>
+        <dt><code>libinput-gestures-setup start</code> says permission denied on <code>/dev/input/eventN</code></dt>
+        <dd>The <code>usermod -aG input</code> step didn't take effect yet — group membership only applies to new login sessions, so log out and back in (checking with <code>groups</code> in a fresh terminal) rather than just re-running the command.</dd>
+      </div>
+      <div>
+        <dt>Three fingers drags a window instead of triggering a gesture</dt>
+        <dd>Turn off three-finger drag on the Touchpad panel's General tab (<span class="mono">Tres dedos → Arrastrar</span>) — it competes with gesture recognition.</dd>
+      </div>
+      <div>
+        <dt>Gestures trigger inconsistently</dt>
+        <dd>Land all three fingertips at once, then move — starting with two fingers and adding a third mid-motion reads as scrolling, not a gesture.</dd>
+      </div>
+      <div>
+        <dt>Left/right feel swapped</dt>
+        <dd>Swap the two <code>gesture swipe left/right</code> lines in <code>~/.config/libinput-gestures.conf</code> and run <code>libinput-gestures-setup restart</code> — direction convention is a matter of taste.</dd>
+      </div>
+    </dl>
+  </section>
+
+  <section>
+    <h2>Going further</h2>
+    <div class="callout">
+      <p><strong>Any other KWin shortcut works the same way:</strong> list every bindable action with <code>busctl --user call org.kde.kglobalaccel /component/kwin org.kde.kglobalaccel.Component shortcutNames</code>, then drop its exact name into an <code>invokeShortcut</code> line — 4-finger sets, pinches, and click-gestures in <code>libinput-gestures.conf</code> all use the same pattern.</p>
+      <p><strong>Not KWin-specific:</strong> since each line is just a shell command, a swipe can just as easily run <code>xdotool</code>, launch an app, or hit a browser shortcut — the daemon doesn't care what it's a gesture <em>for</em>.</p>
+    </div>
+  </section>
+
+  <footer>
+    Verified against this machine's live KWin session on 2026-09-08 — kcm_touchpad's actual panel was screenshotted (no gesture tab), and each D-Bus action was fired and confirmed before being written down here.
+  </footer>
+
+</div>
