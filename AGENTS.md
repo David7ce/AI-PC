@@ -5,9 +5,10 @@ human, see [`README.md`](README.md) instead.
 
 ## What this directory is
 
-AI+PC is a growing, organized workspace on a personal computer. There is no
-fixed roadmap and no backlog — the *only* input is whatever the user prompts
-next. Your job is to take that prompt, place the resulting work in the right
+AI+PC is a growing, organized workspace on a personal computer. There's no
+fixed public roadmap — the *only* input is whatever the user prompts next —
+but there is a personal, gitignored task list at [`TODO.md`](TODO.md). Your
+job is to take whatever's prompted, place the resulting work in the right
 place, and leave the directory more organized than you found it, not less.
 
 This is designed to work the same way on Linux, macOS, and Windows, and with
@@ -16,12 +17,24 @@ the reference implementation, not a requirement.
 
 ## Before you start any task
 
-1. Read [`docs/taxonomy.md`](docs/taxonomy.md) if you haven't already this
+1. Read [`TODO.md`](TODO.md) if it exists — it's the GTD-style task list
+   (Now / Future / Done) the user and every agent share across sessions.
+   Pick up open items from **Now** if the user doesn't specify a task.
+2. Read [`docs/taxonomy.md`](docs/taxonomy.md) if you haven't already this
    session — it defines the seven categories under `categories/` and which
    O\*NET-SOC occupational group each maps to.
-2. Match the user's request to the closest category.
-3. Check whether an existing subdirectory already covers this specific
+3. Match the user's request to the closest category.
+4. Check whether an existing subdirectory already covers this specific
    project/topic before creating a new one — extend, don't duplicate.
+
+## Keeping TODO.md current
+
+- When the user proposes something that isn't done immediately, add it to
+  **Now** or **Future** rather than letting it live only in conversation.
+- When something gets finished, move it to **Done** (most recent first) —
+  don't just delete it silently.
+- This file is gitignored deliberately — it's working state, not something
+  to document *about* in commits or the public README.
 
 ## While working
 
