@@ -26,17 +26,9 @@ Claude Code now acts autonomously by default across every project (writes/edits 
 **3-finger swipe left/right (switch desktop) — already works natively.**
 No daemon involved — this is Plasma's built-in KWin gesture, confirmed by finding no `libinput-gestures` binary anywhere on disk. Nothing to install for this part.
 
-**3-finger swipe up/down (Overview / Show Desktop) — config ready, install still pending.**
-`libinput-gestures` is **not installed yet** (checked: no binary, no process, no systemd unit anywhere on the system). Its config file is already written and correct, copied here as [`libinput-gestures.conf`](./libinput-gestures.conf) → belongs at `~/.config/libinput-gestures.conf`.
+**`libinput-gestures` — installed and running.** User ran the `sudo` steps themselves (this session never had that access). Confirmed via `libinput-gestures-setup status`: installed, running as a desktop-autostart application, using the custom config, `d7` is in the `input` group. Covers swipe up (Overview), down (Show Desktop), and left/right (see the window-focus remap further down) — none of that needed a daemon-config edit to activate once installed, the config was already correct and waiting.
 
-To finish (needs your `sudo` password — this session can't run it for you):
-```bash
-sudo usermod -aG input $USER      # then log out and back in
-git clone https://github.com/bulletmark/libinput-gestures.git
-cd libinput-gestures && sudo make install
-libinput-gestures-setup start
-libinput-gestures-setup autostart
-```
+Still open: confirming with an actual physical swipe (not a D-Bus test, which bypasses libinput's gesture recognizer entirely) that all four directions fire correctly, and specifically that left/right's old native desktop-switch gesture doesn't fire *alongside* the new window-focus remap below. Tracked in this machine's local GTD `next-actions.md` (gitignored, not in this repo).
 Once installed, swipe up/down start working immediately — the config needs no further edits.
 
 **3-finger tap → open all apps — not achievable with this toolchain.**
