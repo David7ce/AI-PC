@@ -7,8 +7,8 @@ human, see [`README.md`](README.md) instead.
 
 AI+PC is a growing, organized workspace on a personal computer. There's no
 fixed public roadmap — the *only* input is whatever the user prompts next —
-but there is a personal, gitignored task list at [`TODO.md`](TODO.md). Your
-job is to take whatever's prompted, place the resulting work in the right
+but there is a personal, gitignored GTD system at [`gtd/`](gtd/). Your job
+is to take whatever's prompted, place the resulting work in the right
 place, and leave the directory more organized than you found it, not less.
 
 This is designed to work the same way on Linux, macOS, and Windows, and with
@@ -17,24 +17,32 @@ the reference implementation, not a requirement.
 
 ## Before you start any task
 
-1. Read [`TODO.md`](TODO.md) if it exists — it's the GTD-style task list
-   (Now / Future / Done) the user and every agent share across sessions.
-   Pick up open items from **Now** if the user doesn't specify a task.
+1. If the user doesn't specify a task, check [`gtd/next-actions.md`](gtd/next-actions.md)
+   and [`gtd/inbox.md`](gtd/inbox.md) for open items to pick up. See
+   [`gtd/README.md`](gtd/README.md) for the full six-file system
+   (inbox / next actions / projects / waiting for / someday-maybe / done).
 2. Read [`docs/taxonomy.md`](docs/taxonomy.md) if you haven't already this
    session — it defines the seven categories under `categories/` and which
-   O\*NET-SOC occupational group each maps to.
+   O\*NET-SOC occupational group each maps to. GTD contexts (`@development`,
+   `@design-art`, etc.) use these same names.
 3. Match the user's request to the closest category.
 4. Check whether an existing subdirectory already covers this specific
    project/topic before creating a new one — extend, don't duplicate.
 
-## Keeping TODO.md current
+## Keeping gtd/ current
 
-- When the user proposes something that isn't done immediately, add it to
-  **Now** or **Future** rather than letting it live only in conversation.
-- When something gets finished, move it to **Done** (most recent first) —
+- Something the user mentions that isn't handled immediately: capture it in
+  `gtd/inbox.md` rather than letting it live only in conversation. Sort it
+  into the right file (next action, project, someday/maybe) during a
+  review, not necessarily right away.
+- A task genuinely blocked on someone/something else (not just "the user
+  hasn't done it yet") goes in `gtd/waiting-for.md`; a one-step thing only
+  the user can do (e.g. needs their `sudo` password) is still their next
+  action, not a wait.
+- When something finishes, move it to `gtd/done.md` (most recent first) —
   don't just delete it silently.
-- This file is gitignored deliberately — it's working state, not something
-  to document *about* in commits or the public README.
+- The whole `gtd/` directory is gitignored deliberately — it's working
+  state, not something to document *about* in commits or the public README.
 
 ## While working
 
