@@ -1,5 +1,10 @@
 # AI+PC
 
+[![License: MIT](https://img.shields.io/badge/license-MIT-blue.svg)](LICENSE)
+
+> Repository name is `AI-PC` on GitHub — `+` isn't reliably safe in GitHub repo
+> names, so it was swapped for a hyphen there. Referred to as AI+PC everywhere else.
+
 A personal computer organized as a workspace for AI agents to grow into —
 not a product, a pattern. You open a terminal here (or in any subdirectory)
 and run an AI coding agent — Claude Code is the one this was built with, but
@@ -28,6 +33,11 @@ work actually is) rather than invented from scratch — see
 | [`writing-education`](categories/writing-education/) | Documentation and explanation |
 | [`business-management`](categories/business-management/) | Planning, budgeting, tracking |
 | [`engineering`](categories/engineering/) | Hardware and physical-world design |
+
+## Getting started
+
+See [`docs/getting-started.md`](docs/getting-started.md) for how to clone
+this and start using it, with example prompts per domain.
 
 ## Platform
 
