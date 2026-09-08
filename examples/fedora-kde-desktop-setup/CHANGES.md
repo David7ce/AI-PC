@@ -60,6 +60,14 @@ busctl --user call org.kde.KWin /Effects org.kde.kwin.Effects reconfigureEffect 
 ```
 So there are now three ways to reach the same "all windows" view: 3-finger swipe up (pending the `libinput-gestures` install), the top-left hot corner (works right now, no install needed), and Overview's own default keyboard shortcut. Swipe down and `Super+D` already point at the same `Show Desktop` shortcut — no separate change needed there, they were already the same action.
 
+**3-finger swipe left/right remapped: desktop-switch → window focus — done, live.**
+Changed on request: left/right no longer switch virtual desktops, they now cycle window focus like Alt+Tab, including unminimizing a hidden window if that's the one selected. Uses KWin's existing TabBox shortcuts, confirmed via `kglobalaccel`'s own shortcut list and tested live (each call is a clean single-shot cycle — no overlay gets left stuck open, unlike holding real Alt+Tab):
+```
+gesture swipe left 3  busctl --user call org.kde.kglobalaccel /component/kwin org.kde.kglobalaccel.Component invokeShortcut s "Walk Through Windows (Reverse)"
+gesture swipe right 3 busctl --user call org.kde.kglobalaccel /component/kwin org.kde.kglobalaccel.Component invokeShortcut s "Walk Through Windows"
+```
+Updated in both `~/.config/libinput-gestures.conf` (live) and `libinput-gestures.conf` in this directory (reference copy) — up/down (Overview / Show Desktop) are unchanged. Note: `touchpad-gestures.html`, the published Artifact guide, still describes the old desktop-switch behavior for left/right and hasn't been regenerated to match.
+
 ## Files in this directory
 
 | File | What it is |
