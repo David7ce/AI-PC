@@ -6,3 +6,10 @@ Thumbs.db
 # for the template) but ignore every actual data file.
 /gtd/*.md
 !/gtd/README.md
+
+# yzane.markdown-pdf export byproducts (same basename as the source .md,
+# generated on demand, always stale the moment the .md changes)
+docs/*.pdf
+docs/*.html
+docs/*.png
+docs/*.jpeg
