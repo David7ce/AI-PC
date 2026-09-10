@@ -60,6 +60,9 @@ gesture swipe right 3 busctl --user call org.kde.kglobalaccel /component/kwin or
 ```
 Updated in both `~/.config/libinput-gestures.conf` (live) and `libinput-gestures.conf` in this directory (reference copy) — up/down (Overview / Show Desktop) are unchanged. Note: `touchpad-gestures.html`, the published Artifact guide, still describes the old desktop-switch behavior for left/right and hasn't been regenerated to match.
 
+**Native desktop-switch gesture conflicting with the window-focus remap — root cause found, fix applied.**
+User confirmed both actions were firing on one 3-finger left/right swipe (desktop switch *and* window focus cycle). Checked KWin's own source (`src/virtualdesktops.cpp` in the [KWin repo](https://invent.kde.org/plasma/kwin)) rather than guess: the native 3/4-finger desktop-switch gesture is registered unconditionally in `VirtualDesktopManager::initShortcuts()`, with no config key anywhere to disable it directly. It only has a visible effect if `grid().width() > 1` — i.e., only if more than one virtual desktop exists. Desktop count is confirmed back to `1` (both live via D-Bus and in `kwinrc`'s `[Desktops]` `Number=1`), which makes the native gesture a silent no-op while `libinput-gestures` — a separate process reading the same touchpad independently — keeps handling the window-focus cycle. Awaiting physical re-test to confirm.
+
 ## Files in this directory
 
 | File | What it is |
