@@ -65,6 +65,16 @@ User confirmed both actions were firing on one 3-finger left/right swipe (deskto
 
 **Confirmed working — with a real constraint worth knowing.** User tested physically: 3-finger left/right now only cycles window focus, no desktop switch, with virtual desktop count at 1. This isn't robust to adding a 2nd desktop back, though: the native gesture has no disable toggle at all, and a 2-desktop grid must be either 2 columns (width>1 → left/right conflict returns) or 2 rows (height>1 → up/down conflict appears instead, fighting Overview/Show Desktop). There's no grid shape that supports 2+ desktops without a conflict on one axis — confirmed by reading the unconditional registration in KWin's source, not something a config change gets around. If more desktops are wanted later, this trade-off has to be accepted on whichever axis, not re-solved.
 
+**3-finger swipe down: `Show Desktop` → `MinimizeAll`, for real animation — done, live.**
+`Show Desktop` was requested to be more animated. Traced it to a genuine KWin architecture gap, confirmed by reading the actual source: `Workspace::setShowingDesktop` hides windows via a separate `hiddenByShowDesktop` state, and the loaded `squash` minimize-animation effect only listens for the standard `minimized` property changing (`window.minimizedChanged` in [`squash`'s own JS source](https://invent.kde.org/plasma/kwin/-/blob/master/src/plugins/squash/package/contents/code/main.js)) — the two paths never meet, so Show Desktop has no animation in this KWin version, period, regardless of any setting.
+
+Fix: KWin ships an (unused-by-default) bundled script, `minimizeall` (`/usr/share/kwin-wayland/scripts/minimizeall/`), that toggles real per-window `.minimized` state instead — same end result as Show Desktop, but it goes through the actual animated path. Enabled it:
+```
+kwriteconfig6 --file kwinrc --group "Plugins" --key "minimizeallEnabled" true
+busctl --user call org.kde.KWin /KWin org.kde.KWin reconfigure
+```
+This registers a new global shortcut, `MinimizeAll`, confirmed via `kglobalaccel`'s shortcut list and tested live (all windows minimized and restored correctly). Swipe down now calls `MinimizeAll` instead of `Show Desktop` in both `~/.config/libinput-gestures.conf` and this directory's reference copy. Up/left/right are unchanged.
+
 ## Files in this directory
 
 | File | What it is |
