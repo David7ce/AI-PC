@@ -2,4 +2,7 @@
 .DS_Store
 Thumbs.db
 .agent/
-/gtd/
+# GTD is personal working state - keep the README (documents the pattern
+# for the template) but ignore every actual data file.
+/gtd/*.md
+!/gtd/README.md
