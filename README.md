@@ -40,9 +40,10 @@ See [`docs/getting-started.md`](docs/getting-started.md) for how to clone
 this and start using it, with example prompts per domain.
 
 New to AI coding agents, or to Claude Code specifically? Start with
-[`docs/ai-agents-and-claude-code.md`](docs/ai-agents-and-claude-code.md) —
-generic agent concepts plus Claude Code in detail, with links to the
-official docs throughout.
+[`docs/ai-agent-concepts.md`](docs/ai-agent-concepts.md) (generic ideas
+shared by any agent) and [`docs/claude-code-reference.md`](docs/claude-code-reference.md)
+(everything about Claude Code — every command, flag, and setting — with
+links to the official docs throughout).
 
 ## Platform
 
