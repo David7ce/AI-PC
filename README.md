@@ -39,6 +39,11 @@ work actually is) rather than invented from scratch — see
 See [`docs/getting-started.md`](docs/getting-started.md) for how to clone
 this and start using it, with example prompts per domain.
 
+New to AI coding agents, or to Claude Code specifically? Start with
+[`docs/ai-agents-and-claude-code.md`](docs/ai-agents-and-claude-code.md) —
+generic agent concepts plus Claude Code in detail, with links to the
+official docs throughout.
+
 ## Platform
 
 Plain files and folders plus Markdown — nothing here depends on a specific
