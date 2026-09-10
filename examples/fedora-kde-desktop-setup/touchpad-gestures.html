@@ -279,8 +279,8 @@
           <path d="M100 32 L100 56 M92 48 L100 58 L108 48" fill="none" stroke="var(--accent-strong)" stroke-width="4" stroke-linecap="round" stroke-linejoin="round"/>
         </svg>
         <span class="glabel">Swipe down</span>
-        <span class="gaction">Show Desktop</span>
-        <p>Minimizes every window to reveal the desktop; repeat the swipe to bring them back.</p>
+        <span class="gaction">Minimize all (animated)</span>
+        <p>Minimizes every window with a real shrink-to-taskbar animation; repeat the swipe to bring them back. Deliberately not KDE's "Show Desktop" — that action has no animation in current KWin at all, by design, regardless of settings (see the callout below).</p>
       </div>
 
       <div class="gcard">
@@ -292,8 +292,8 @@
           <path d="M112 46 L88 46 M96 38 L86 46 L96 54" fill="none" stroke="var(--accent-strong)" stroke-width="4" stroke-linecap="round" stroke-linejoin="round"/>
         </svg>
         <span class="glabel">Swipe left</span>
-        <span class="gaction">Desktop → right</span>
-        <p>Steps to the next virtual desktop. This machine had only one desktop — a second was created so this actually goes somewhere.</p>
+        <span class="gaction">Previous window</span>
+        <p>Cycles window focus backward, Alt+Tab-style — including unminimizing a hidden window if that's the one it lands on. Deliberately <em>not</em> a virtual-desktop switch (see the constraint below).</p>
       </div>
 
       <div class="gcard">
@@ -305,8 +305,8 @@
           <path d="M88 46 L112 46 M104 38 L114 46 L104 54" fill="none" stroke="var(--accent-strong)" stroke-width="4" stroke-linecap="round" stroke-linejoin="round"/>
         </svg>
         <span class="glabel">Swipe right</span>
-        <span class="gaction">Desktop → left</span>
-        <p>Steps to the previous virtual desktop, mirroring the left swipe.</p>
+        <span class="gaction">Next window</span>
+        <p>Cycles window focus forward, mirroring the left swipe.</p>
       </div>
 
     </div>
@@ -331,7 +331,7 @@
       <li>
         <div class="step-body">
           <strong>The config is already written.</strong>
-          <p><code>~/.config/libinput-gestures.conf</code> maps 3-finger up/down/left/right to <span class="mono">Overview</span>, <span class="mono">Show Desktop</span>, and desktop-switch-right/left. Each line runs the exact <code>busctl --user call org.kde.kglobalaccel …</code> command verified against this KWin session — nothing to fill in.</p>
+          <p><code>~/.config/libinput-gestures.conf</code> maps 3-finger up/down/left/right to <span class="mono">Overview</span>, <span class="mono">MinimizeAll</span> (animated), and window-focus previous/next. Each line runs the exact <code>busctl --user call org.kde.kglobalaccel …</code> command verified against this KWin session — nothing to fill in.</p>
         </div>
       </li>
       <li>
@@ -350,11 +350,25 @@
   </section>
 
   <section>
-    <h2>Already done on this machine</h2>
+    <h2>Confirmed final state</h2>
     <div class="callout">
-      <p><strong>Verified live, before writing any of this:</strong> <span class="mono">Overview</span>, <span class="mono">Show Desktop</span>, and both desktop-switch shortcuts were each fired once over D-Bus and confirmed to work (screenshots taken, state restored). A second virtual desktop was also created — there was only one before, which would have made the left/right swipes silent no-ops.</p>
-      <p><strong>Not done:</strong> the <code>input</code>-group membership and <code>libinput-gestures</code> install above — both need your <code>sudo</code> password, which this session doesn't have. Run those two commands yourself (via <code>!command</code> if you're in Claude Code) and the gesture config is already sitting there ready to go.</p>
+      <p><strong>All four directions tested working with a real touchpad gesture</strong> — not just a D-Bus dry run. <span class="mono">Overview</span> (up), <span class="mono">MinimizeAll</span> (down), and window-focus cycling (left/right) all fire correctly, and the earlier concern — that the native, hardcoded 3-finger desktop-switch gesture might fire <em>alongside</em> the new left/right window-focus mapping — was confirmed resolved.</p>
+      <p><strong>The daemon install needed your <code>sudo</code> password</strong> — this session never had that, so it waited for you to run <code>install-gestures.sh</code> yourself. Confirmed afterward via <code>libinput-gestures-setup status</code>: installed, running, autostarting, using this exact config.</p>
     </div>
+  </section>
+
+  <section>
+    <h2>Two real limitations worth knowing</h2>
+    <dl class="trouble">
+      <div>
+        <dt>Left/right only stays desktop-switch-free with exactly 1 virtual desktop</dt>
+        <dd>KWin's native 3/4-finger desktop-switch gesture is hardcoded with no config toggle at all — confirmed by reading KWin's own source (<code>virtualdesktops.cpp</code>). It only has a visible effect if the desktop grid is more than 1 wide or tall. At 1 desktop, both dimensions are 1, so it's silent. Add a 2nd desktop and the grid must grow one way or the other: 2 columns brings the desktop-switch conflict back on <strong>left/right</strong>; 2 rows brings a conflict on <strong>up/down</strong> instead, fighting Overview/MinimizeAll. There's no arrangement that supports 2+ desktops without a conflict on one axis — a real trade-off to accept, not a setting to find.</dd>
+      </div>
+      <div>
+        <dt>"Show Desktop" was deliberately not used for swipe-down</dt>
+        <dd>It has zero animation in current KWin, unconditionally — confirmed in source: it hides windows through a separate internal state that the <span class="mono">squash</span> minimize-animation effect never listens to. KWin ships an unused-by-default <code>minimizeall</code> script that toggles real per-window minimize instead, which <span class="mono">squash</span> does animate — enabled via <code>kwriteconfig6 --file kwinrc --group Plugins --key minimizeallEnabled true</code> plus a KWin reconfigure. That's what swipe-down actually calls.</dd>
+      </div>
+    </dl>
   </section>
 
   <section>
@@ -380,6 +394,10 @@
         <dt>Left/right feel swapped</dt>
         <dd>Swap the two <code>gesture swipe left/right</code> lines in <code>~/.config/libinput-gestures.conf</code> and run <code>libinput-gestures-setup restart</code> — direction convention is a matter of taste.</dd>
       </div>
+      <div>
+        <dt>Left/right also switches virtual desktops, not just window focus</dt>
+        <dd>You likely have a 2nd virtual desktop configured — see "Two real limitations worth knowing" above. Reduce back to 1 desktop (<code>System Settings → Workspace Behavior → Virtual Desktops</code>) to silence KWin's native gesture.</dd>
+      </div>
     </dl>
   </section>
 
@@ -392,7 +410,7 @@
   </section>
 
   <footer>
-    Verified against this machine's live KWin session on 2026-09-08 — kcm_touchpad's actual panel was screenshotted (no gesture tab), and each D-Bus action was fired and confirmed before being written down here.
+    Verified against this machine's live KWin session, 2026-09-08 through 2026-09-10 — kcm_touchpad's actual panel was screenshotted (no gesture tab), every action was fired over D-Bus and confirmed before being written down, and the final left/right/down remap was confirmed with a real physical touchpad gesture, not just a dry run.
   </footer>
 
 </div>
